@@ -43,7 +43,7 @@ jobs:
 
     - name: Notebook Deployment
       run: |
-        python ${{ github.workspace }}/devops_scripts/notebooks.py
+        python ${{ github.workspace }}/devops_scripts/devops_scripts/notebooks.py
       env:
         TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
         AZURE_REPO_PATH: ${{ github.workspace }}
