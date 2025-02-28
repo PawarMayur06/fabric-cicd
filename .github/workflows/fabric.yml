@@ -1,0 +1,48 @@
+name: Migrate Microsoft Fabric Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  migrate-pipeline:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Migrate Pipeline from Dev to Prod
+        env:
+          FABRIC_ACCESS_TOKEN: ${{ secrets.FABRIC_ACCESS_TOKEN }}
+          DEV_WORKSPACE_ID: ${{ secrets.DEV_WORKSPACE_ID }}
+          PROD_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
+          PIPELINE_ID: ${{ secrets.PIPELINE_ID_1 }}
+        run: |
+          # Fetch pipeline configuration from dev workspace
+          curl -X GET "https://api.fabric.microsoft.com/workspaces/$DEV_WORKSPACE_ID/pipelines/$PIPELINE_ID" \
+          -H "Authorization: Bearer $FABRIC_ACCESS_TOKEN" \
+          -o pipeline_config.json
+
+          # Modify the workspace ID in the pipeline config for prod
+          sed -i 's/$DEV_WORKSPACE_ID/$PROD_WORKSPACE_ID/g' pipeline_config.json
+          
+          # Import the pipeline to the prod workspace
+          curl -X POST "https://api.fabric.microsoft.com/workspaces/$PROD_WORKSPACE_ID/pipelines" \
+          -H "Authorization: Bearer $FABRIC_ACCESS_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d @pipeline_config.json
+          
+          echo "Pipeline migrated successfully from dev to prod."
