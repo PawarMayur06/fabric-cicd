@@ -13,6 +13,7 @@ jobs:
     env:
       TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
       SOURCE_WORKSPACE_ID: ${{ secrets.DEV_WORKSPACE_ID }}
+      AUTH_TOKEN: ${{ SECRETS.AUTH_TOKEN }}
       AZURE_REPO_PATH: ${{ github.workspace }}
     
     steps:
@@ -30,11 +31,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests
 
-    - name: Fetch Auth Token
-      run: |
-        az login --service-principal --username ${{ secrets.CLIENT_ID }} --password ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
-        TOKEN=$(az account get-access-token --resource "https://api.fabric.microsoft.com" --query accessToken -o tsv)
-        echo "AUTH_TOKEN=$TOKEN" >> $GITHUB_ENV
+    # - name: Fetch Auth Token
+    #   run: |
+    #     az login --service-principal --username ${{ secrets.CLIENT_ID }} --password ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+    #     TOKEN=$(az account get-access-token --resource "https://api.fabric.microsoft.com" --query accessToken -o tsv)
+    #     echo "AUTH_TOKEN=$TOKEN" >> $GITHUB_ENV
 
     - name: Check current directory
       run: |
