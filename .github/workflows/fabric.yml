@@ -36,6 +36,11 @@ jobs:
         TOKEN=$(az account get-access-token --resource "https://api.fabric.microsoft.com" --query accessToken -o tsv)
         echo "AUTH_TOKEN=$TOKEN" >> $GITHUB_ENV
 
+    - name: Check current directory
+      run: |
+        echo "Current working directory:"
+        pwd
+
     - name: Notebook Deployment
       run: |
         python ${{ github.workspace }}/devops_scripts/notebooks.py
@@ -43,11 +48,6 @@ jobs:
         TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
         AZURE_REPO_PATH: ${{ github.workspace }}
         AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
-    
-    - name: Check current directory
-      run: |
-        echo "Current working directory:"
-        pwd
 
     - name: Pipeline Deployment
       run: |
