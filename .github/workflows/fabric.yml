@@ -46,10 +46,10 @@ jobs:
       run: |
         python ${{ github.workspace }}/devops_scripts/devops_scripts/notebooks.py
       env:
-        TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
+        TARGET_WORKSPACE_ID: ${{ vars.PROD_WORKSPACE_ID }}
         # target_workspace_id: ${{ secrets.PROD_WORKSPACE_ID }}
         AZURE_REPO_PATH: ${{ github.workspace }}
-        AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+        AUTH_TOKEN: ${{ vars.AUTH_TOKEN }}
         # auth_token: ${{ secrets.AUTH_TOKEN }}
 
     # - name: Pipeline Deployment
