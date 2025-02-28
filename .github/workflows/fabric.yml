@@ -36,13 +36,13 @@ jobs:
         TOKEN=$(az account get-access-token --resource "https://api.fabric.microsoft.com" --query accessToken -o tsv)
         echo "AUTH_TOKEN=$TOKEN" >> $GITHUB_ENV
 
-    # - name: Notebook Deployment
-    #   run: |
-    #     python ${{ github.workspace }}/devops_scripts/notebooks.py
-    #   env:
-    #     TARGET_WORKSPACE_ID: ${{ secrets.TARGET_WORKSPACE_ID }}
-    #     AZURE_REPO_PATH: ${{ github.workspace }}
-    #     AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
+    - name: Notebook Deployment
+      run: |
+        python ${{ github.workspace }}/devops_scripts/notebooks.py
+      env:
+        TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
+        AZURE_REPO_PATH: ${{ github.workspace }}
+        AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
     
     - name: Check current directory
       run: |
@@ -53,8 +53,8 @@ jobs:
       run: |
         python ${{ github.workspace }}/devops_scripts/devops_scripts/deployment-pipelines.py
       env:
-        source_workspace_id: ${{ secrets.SOURCE_WORKSPACE_ID }}
-        target_workspace_id: ${{ secrets.TARGET_WORKSPACE_ID }}
+        source_workspace_id: ${{ secrets.DEV_WORKSPACE_ID }}
+        target_workspace_id: ${{ secrets.PROD_WORKSPACE_ID }}
         base_path: ${{ github.workspace }}
         auth_token: ${{ env.AUTH_TOKEN }}
 
