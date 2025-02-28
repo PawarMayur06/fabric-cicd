@@ -13,6 +13,7 @@ jobs:
     env:
       TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
       SOURCE_WORKSPACE_ID: ${{ secrets.DEV_WORKSPACE_ID }}
+      AZURE_REPO_PATH: ${{ github.workspace }}
     
     steps:
 
