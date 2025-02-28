@@ -13,7 +13,7 @@ jobs:
     env:
       TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
       SOURCE_WORKSPACE_ID: ${{ secrets.DEV_WORKSPACE_ID }}
-      AUTH_TOKEN: ${{ SECRETS.AUTH_TOKEN }}
+      AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
       AZURE_REPO_PATH: ${{ github.workspace }}
     
     steps:
@@ -48,7 +48,7 @@ jobs:
       env:
         TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
         AZURE_REPO_PATH: ${{ github.workspace }}
-        AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
+        AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
 
     - name: Pipeline Deployment
       run: |
@@ -57,7 +57,7 @@ jobs:
         source_workspace_id: ${{ secrets.DEV_WORKSPACE_ID }}
         target_workspace_id: ${{ secrets.PROD_WORKSPACE_ID }}
         base_path: ${{ github.workspace }}
-        auth_token: ${{ env.AUTH_TOKEN }}
+        auth_token: ${{ secrets.AUTH_TOKEN }}
 
     - name: Organize Resources
       run: |
