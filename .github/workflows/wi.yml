@@ -1,0 +1,25 @@
+name: Deploy Data Pipelines from Dev to Prod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Authenticate using Workspace Identity (MS Fabric)
+      run: |
+
+        az login --identity --tenant ${{ secrets.TENANT_ID }}
+
+    - name: Export Pipelines from Dev Workspace
+      run: |
+        fabric-cli export-pipeline --workspace-id ${{ secrets.DEV_WORKSPACE_ID }} --pipeline-name "pipeline2" --output-file pipeline-dev.json
+
+    - name: Import Pipelines to Prod Workspace
+      run: |
+        fabric-cli import-pipeline --workspace-id ${{ secrets.PROD_WORKSPACE_ID }} --pipeline-name "pipeline2" --input-file pipeline-dev.json
