@@ -1,5 +1,4 @@
-name: Migrate Microsoft Fabric Pipeline
-
+name: Deployment Pipeline
 on:
   push:
     branches:
@@ -7,42 +6,53 @@ on:
   workflow_dispatch:
 
 jobs:
-  migrate-pipeline:
+  deploy:
     runs-on: ubuntu-latest
-    environment: test
+
+    env:
+      TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
+      SOURCE_WORKSPACE_ID: ${{ secrets.DEV_WORKSPACE_ID }}
+    
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10
 
-      - name: Migrate Pipeline from Dev to Prod
-        env:
-          FABRIC_ACCESS_TOKEN: ${{ secrets.FABRIC_ACCESS_TOKEN }}
-          DEV_WORKSPACE_ID: ${{ secrets.DEV_WORKSPACE_ID }}
-          PROD_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
-          PIPELINE_ID: ${{ secrets.PIPELINE_ID_1 }}
-        run: |
-          # Fetch pipeline configuration from dev workspace
-          curl -X GET "https://api.fabric.microsoft.com/workspaces/$DEV_WORKSPACE_ID/pipelines/$PIPELINE_ID" \
-          -H "Authorization: Bearer $FABRIC_ACCESS_TOKEN" \
-          -o pipeline_config.json
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
 
-          # Modify the workspace ID in the pipeline config for prod
-          sed -i 's/$DEV_WORKSPACE_ID/$PROD_WORKSPACE_ID/g' pipeline_config.json
-          
-          # Import the pipeline to the prod workspace
-          curl -X POST "https://api.fabric.microsoft.com/workspaces/$PROD_WORKSPACE_ID/pipelines" \
-          -H "Authorization: Bearer $FABRIC_ACCESS_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d @pipeline_config.json
-          
-          echo "Pipeline migrated successfully from dev to prod."
+    - name: Fetch Auth Token
+      run: |
+        az login --service-principal --username ${{ secrets.CLIENT_ID }} --password ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+        TOKEN=$(az account get-access-token --resource "https://api.fabric.microsoft.com" --query accessToken -o tsv)
+        echo "AUTH_TOKEN=$TOKEN" >> $GITHUB_ENV
+
+    # - name: Notebook Deployment
+    #   run: |
+    #     python ${{ github.workspace }}/devops_scripts/notebooks.py
+    #   env:
+    #     TARGET_WORKSPACE_ID: ${{ secrets.TARGET_WORKSPACE_ID }}
+    #     AZURE_REPO_PATH: ${{ github.workspace }}
+    #     AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
+
+    - name: Pipeline Deployment
+      run: |
+        python ${{ github.workspace }}/devops_scripts/deployment-pipelines.py
+      env:
+        source_workspace_id: ${{ secrets.SOURCE_WORKSPACE_ID }}
+        target_workspace_id: ${{ secrets.TARGET_WORKSPACE_ID }}
+        base_path: ${{ github.workspace }}
+        auth_token: ${{ env.AUTH_TOKEN }}
+
+    - name: Organize Resources
+      run: |
+        echo "Waiting 30 seconds before organizing resources..."
+        sleep 30
+        python ${{ github.workspace }}/devops_scripts/folder-structure.py --workspace-id "${{ secrets.TARGET_WORKSPACE_ID }}" --token "${{ env.AUTH_TOKEN }}" source --dir "${{ github.workspace }}"
