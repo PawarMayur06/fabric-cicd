@@ -52,17 +52,17 @@ jobs:
         AUTH_TOKEN: ${{ vars.AUTH_TOKEN }}
         # auth_token: ${{ secrets.AUTH_TOKEN }}
 
-    # - name: Pipeline Deployment
-    #   run: |
-    #     python ${{ github.workspace }}/devops_scripts/devops_scripts/deployment-pipelines.py
-    #   env:
-    #     source_workspace_id: ${{ secrets.DEV_WORKSPACE_ID }}
-    #     target_workspace_id: ${{ secrets.PROD_WORKSPACE_ID }}
-    #     base_path: ${{ github.workspace }}
-    #     auth_token: ${{ secrets.AUTH_TOKEN }}
+    - name: Pipeline Deployment
+      run: |
+        python ${{ github.workspace }}/devops_scripts/devops_scripts/deployment-pipelines.py
+      env:
+        source_workspace_id: ${{ vars.DEV_WORKSPACE_ID }}
+        target_workspace_id: ${{ vars.PROD_WORKSPACE_ID }}
+        base_path: ${{ github.workspace }}
+        auth_token: ${{ vars.AUTH_TOKEN }}
 
-    # - name: Organize Resources
-    #   run: |
-    #     echo "Waiting 30 seconds before organizing resources..."
-    #     sleep 30
-    #     python ${{ github.workspace }}/devops_scripts/devops_scripts/folder-structure.py --workspace-id "${{ secrets.TARGET_WORKSPACE_ID }}" --token "${{ env.AUTH_TOKEN }}" source --dir "${{ github.workspace }}"
+    - name: Organize Resources
+      run: |
+        echo "Waiting 30 seconds before organizing resources..."
+        sleep 30
+        python ${{ github.workspace }}/devops_scripts/devops_scripts/folder-structure.py --workspace-id "${{ vars.PROD_WORKSPACE_ID }}" --token "${{ vars.AUTH_TOKEN }}" source --dir "${{ github.workspace }}"
