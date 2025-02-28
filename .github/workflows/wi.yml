@@ -14,8 +14,7 @@ jobs:
     - name: Authenticate using Workspace Identity (MS Fabric)
       run: |
 
-        az login --identity --tenant ${{ secrets.TENANT_ID }}
-
+        az login --identity --client-id 8e550542-7501-4f8c-b96f-c91ca87d47ca
     - name: Export Pipelines from Dev Workspace
       run: |
         fabric-cli export-pipeline --workspace-id ${{ secrets.DEV_WORKSPACE_ID }} --pipeline-name "pipeline2" --output-file pipeline-dev.json
