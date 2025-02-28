@@ -43,10 +43,15 @@ jobs:
     #     TARGET_WORKSPACE_ID: ${{ secrets.TARGET_WORKSPACE_ID }}
     #     AZURE_REPO_PATH: ${{ github.workspace }}
     #     AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
+    
+    - name: Check current directory
+      run: |
+        echo "Current working directory:"
+        pwd
 
     - name: Pipeline Deployment
       run: |
-        python ${{ github.workspace }}/devops_scripts/deployment-pipelines.py
+        python ${{ github.workspace }}/devops_scripts/devops_scripts/deployment-pipelines.py
       env:
         source_workspace_id: ${{ secrets.SOURCE_WORKSPACE_ID }}
         target_workspace_id: ${{ secrets.TARGET_WORKSPACE_ID }}
@@ -57,4 +62,4 @@ jobs:
       run: |
         echo "Waiting 30 seconds before organizing resources..."
         sleep 30
-        python ${{ github.workspace }}/devops_scripts/folder-structure.py --workspace-id "${{ secrets.TARGET_WORKSPACE_ID }}" --token "${{ env.AUTH_TOKEN }}" source --dir "${{ github.workspace }}"
+        python ${{ github.workspace }}/devops_scripts/devops_scripts/folder-structure.py --workspace-id "${{ secrets.TARGET_WORKSPACE_ID }}" --token "${{ env.AUTH_TOKEN }}" source --dir "${{ github.workspace }}"
