@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: test
 
     env:
       TARGET_WORKSPACE_ID: ${{ secrets.PROD_WORKSPACE_ID }}
